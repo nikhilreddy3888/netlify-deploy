@@ -3,6 +3,7 @@
 import {program} from 'commander';
 import axios from 'axios'
 import dotenv from 'dotenv';
+import path from 'path';
 
 dotenv.config();
 
@@ -34,11 +35,11 @@ async function createSite() {
   }
 }
 
-async function deployToNetlify(path) {
+async function deployToNetlify(directoryPath) {
   try {
     const { NETLIFY_API_TOKEN } = process.env;
 
-    if (!NETLIFY_API_TOKEN || !path) {
+    if (!NETLIFY_API_TOKEN || !directoryPath) {
       console.error('Error: Netlify credentials or path are missing. Make sure to provide NETLIFY_API_TOKEN and NETLIFY_PATH in your .env file, or pass the path argument when running the command.');
       return;
     }
@@ -51,7 +52,7 @@ async function deployToNetlify(path) {
       return;
     }
 
-    const buildPath = path.join(process.cwd(), path);
+    const buildPath = path.join(process.cwd(), directoryPath);
     console.log("build directory path", buildPath);
     const zipPath = await zipDirectory(buildPath);
     console.log("zip create path", zipPath);
@@ -99,12 +100,12 @@ function zipDirectory(source, output) {
 program
   .command('deploy [path]')
   .description('Redeploy the previously deployed React app to Netlify')
-  .action(async (path) => {
-    if (!path) {
+  .action(async (directoryPath) => {
+    if (!directoryPath) {
       // Set a default path if none is provided
-      path = path.join(process.cwd(), 'build');
+      directoryPath = path.join(process.cwd(), 'build');
     }
-    await deployToNetlify(path);
+    await deployToNetlify(directoryPath);
   });
 
 program.parse(process.argv);
