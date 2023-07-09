@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import archiver from 'archiver';
 import fs from 'fs'
+import FormData from 'form-data';
 
 dotenv.config();
 
