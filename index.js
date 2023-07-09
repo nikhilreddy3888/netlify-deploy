@@ -67,7 +67,6 @@ async function deployToNetlify(directoryPath) {
         'Content-Type': 'application/zip'
       }
     });
-    console.log("deploy response", JSON.stringify(response.data));
 
     const deployId = response.data.id;
     console.log('Deployment initiated. Deploy ID:', deployId);
