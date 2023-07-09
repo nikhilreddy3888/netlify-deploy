@@ -51,15 +51,21 @@ async function deployToNetlify(path) {
       return;
     }
 
-    const response = await axios.post(
-      `https://api.netlify.com/api/v1/sites/${siteId}/deploys`,
-      { dir: path },
-      {
-        headers: {
-          Authorization: `Bearer ${NETLIFY_API_TOKEN}`
-        }
+    const buildPath = path.join(process.cwd(), path);
+    console.log("build directory path", buildPath);
+    const zipPath = await zipDirectory(buildPath);
+    console.log("zip create path", zipPath);
+    const deployUrl = `https://api.netlify.com/api/v1/sites/${siteId}/deploys`;
+
+    const formData = new FormData();
+    formData.append('functionsZip', fs.createReadStream(zipPath));
+
+    const response = await axios.post(deployUrl, formData, {
+      headers: {
+        Authorization: `Bearer ${NETLIFY_API_TOKEN}`,
+        'Content-Type': 'multipart/form-data'
       }
-    );
+    });
 
     const deployId = response.data.id;
     console.log('Deployment initiated. Deploy ID:', deployId);
@@ -68,6 +74,26 @@ async function deployToNetlify(path) {
   } catch (error) {
     console.error('Error deploying to Netlify:', error);
   }
+}
+
+
+// Helper function to create a zip file of the build directory
+function zipDirectory(source, output) {
+  const archiver = require('archiver');
+  const zipPath = path.join(process.cwd(), 'build.zip');
+
+  return new Promise((resolve, reject) => {
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    const stream = fs.createWriteStream(zipPath);
+
+    archive
+      .directory(source, false)
+      .on('error', (error) => reject(error))
+      .pipe(stream);
+
+    stream.on('close', () => resolve(zipPath));
+    archive.finalize();
+  });
 }
 
 program
