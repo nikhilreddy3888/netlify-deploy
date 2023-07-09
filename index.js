@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-const { program } = require('commander');
-const axios = require('axios');
-const dotenv = require('dotenv');
-const path = require('path');
-const fs = require('fs');
+import {program} from 'commander';
+import axios from 'axios'
+import dotenv from 'dotenv';
+import path from 'path'
+import fs from 'fs'
 
 dotenv.config();
 
