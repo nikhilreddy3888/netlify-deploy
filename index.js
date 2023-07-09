@@ -61,10 +61,7 @@ async function deployToNetlify(directoryPath) {
     console.log("zip create path", zipPath);
     const deployUrl = `https://api.netlify.com/api/v1/sites/${siteId}/deploys`;
 
-    const formData = new FormData();
-    formData.append('build.zip', fs.createReadStream(zipPath));
-
-    const response = await axios.post(deployUrl,formData, {
+    const response = await axios.post(deployUrl,fs.createReadStream(zipPath), {
       headers: {
         Authorization: `Bearer ${NETLIFY_API_TOKEN}`,
         'Content-Type': 'application/zip'

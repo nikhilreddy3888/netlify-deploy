@@ -1,6 +1,6 @@
 {
   "name": "@nikhilreddy3888/netlifypush",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "A cli tool allows users to deploy a Single Page React application to Netlify",
   "main": "index.js",
   "bin": "index.js",
