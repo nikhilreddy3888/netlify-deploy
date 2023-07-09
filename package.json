@@ -1,6 +1,6 @@
 {
   "name": "@nikhilreddy3888/netlifypush",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "A cli tool allows users to deploy a Single Page React application to Netlify",
   "main": "index.js",
   "bin": "index.js",
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/nikhilreddy3888/netlify-deploy#readme",
   "dependencies": {
+    "archiver": "^5.3.1",
     "axios": "^1.4.0",
     "commander": "^11.0.0",
     "dotenv": "^16.3.1"
