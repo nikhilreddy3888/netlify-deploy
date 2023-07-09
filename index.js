@@ -4,6 +4,7 @@ import {program} from 'commander';
 import axios from 'axios'
 import dotenv from 'dotenv';
 import path from 'path';
+import archiver from 'archiver';
 
 dotenv.config();
 
@@ -58,15 +59,13 @@ async function deployToNetlify(directoryPath) {
     console.log("zip create path", zipPath);
     const deployUrl = `https://api.netlify.com/api/v1/sites/${siteId}/deploys`;
 
-    const formData = new FormData();
-    formData.append('functionsZip', fs.createReadStream(zipPath));
-
-    const response = await axios.post(deployUrl, formData, {
+    const response = await axios.post(deployUrl, '@'+zipPath , {
       headers: {
         Authorization: `Bearer ${NETLIFY_API_TOKEN}`,
-        'Content-Type': 'multipart/form-data'
+        'Content-Type': 'application/zip'
       }
     });
+    console.log("deploy response", JSON.stringify(response.data));
 
     const deployId = response.data.id;
     console.log('Deployment initiated. Deploy ID:', deployId);
@@ -80,7 +79,6 @@ async function deployToNetlify(directoryPath) {
 
 // Helper function to create a zip file of the build directory
 function zipDirectory(source, output) {
-  const archiver = require('archiver');
   const zipPath = path.join(process.cwd(), 'build.zip');
 
   return new Promise((resolve, reject) => {
