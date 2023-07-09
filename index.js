@@ -3,53 +3,34 @@
 import {program} from 'commander';
 import axios from 'axios'
 import dotenv from 'dotenv';
-import path from 'path'
-import fs from 'fs'
 
 dotenv.config();
 
-async function getSiteId() {
+async function createSite() {
   try {
-    const { NETLIFY_API_TOKEN, NETLIFY_SITE_ID } = process.env;
-
-    if (NETLIFY_SITE_ID) {
-      console.log('Using existing site ID from .env file:', NETLIFY_SITE_ID);
-      return NETLIFY_SITE_ID;
-    }
+    const { NETLIFY_API_TOKEN } = process.env;
 
     if (!NETLIFY_API_TOKEN) {
-      console.error('Error: Netlify API token is missing. Make sure to provide NETLIFY_API_TOKEN in your .env file.');
+      console.error('Error: Netlify API token is missing. Make sure to provide NETLIFY_API_TOKEN in your environment variables.');
       return;
     }
 
-    console.log('Retrieving the existing site ID...');
+    const apiUrl = 'https://api.netlify.com/api/v1/sites';
 
-    const response = await axios.get('https://api.netlify.com/api/v1/sites', {
+    const response = await axios.post(apiUrl, {}, {
       headers: {
         Authorization: `Bearer ${NETLIFY_API_TOKEN}`
       }
     });
 
-    const sites = response.data;
-    if (!sites || sites.length === 0) {
-      console.error('Error: No sites found. Make sure you have previously deployed the site.');
-      return;
-    }
+    const siteId = response.data.site_id;
+    console.log('New site created. Site ID:', siteId);
 
-    const existingSite = sites[0]; // Assuming you want the first site in the list
-    const siteId = existingSite.site_id;
-
-    console.log('Existing site ID:', siteId);
-
-    // Save the site ID to the .env file
-    fs.appendFileSync('.env', `\nNETLIFY_SITE_ID=${siteId}`);
-    
-    console.log('Site ID saved to .env file.');
-
+    // Perform any additional operations with the created site ID
     return siteId;
+
   } catch (error) {
-    console.error('Error retrieving the existing site ID:', error);
-    throw error;
+    console.error('Error creating new site in Netlify:', error.response.data);
   }
 }
 
@@ -64,7 +45,7 @@ async function deployToNetlify(path) {
 
     console.log('Deploying to Netlify...');
 
-    const siteId = await getSiteId();
+    const siteId = await createSite();
     if (!siteId) {
       console.error('Error: Could not retrieve the site ID. Make sure the site has been previously deployed.');
       return;
