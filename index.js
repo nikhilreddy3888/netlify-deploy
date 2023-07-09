@@ -5,6 +5,7 @@ import axios from 'axios'
 import dotenv from 'dotenv';
 import path from 'path';
 import archiver from 'archiver';
+import fs from 'fs'
 
 dotenv.config();
 
